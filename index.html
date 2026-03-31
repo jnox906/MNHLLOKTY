@@ -3,83 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Resources</title> <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
+    <title>Math Resources</title>
     <style>
-        :root { --neon: #00d4ff; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; }
-        header { padding: 20px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; background: #000; position: sticky; top: 0; z-index: 100; }
-        .logo { font-family: 'Orbitron'; color: var(--neon); font-size: 1.5rem; letter-spacing: 3px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: #111; border: 1px solid #333; border-radius: 10px; overflow: hidden; transition: 0.3s; cursor: pointer; }
-        .card:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 0 15px rgba(0,212,255,0.3); }
-        .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-        .card-info { padding: 10px; text-align: center; font-size: 0.9rem; color: var(--neon); text-transform: uppercase; }
-        #loading { text-align: center; padding: 50px; color: var(--neon); font-family: 'Orbitron'; }
+        /* This creates the look of the grid */
+        body { background: #000; color: #00d4ff; font-family: sans-serif; margin: 0; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; 
+            padding: 20px; 
+        }
+        .card { 
+            background: #111; 
+            border: 1px solid #00d4ff; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-align: center;
+            padding-bottom: 10px;
+        }
+        .card img { width: 100%; border-radius: 8px 8px 0 0; }
+        .card-info { margin-top: 10px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">MNHLLOKTY</div>
-    <div style="color: #39ff14; font-size: 0.8rem;">● SECURE_LINK_ACTIVE</div>
-</header>
+    <div style="padding: 20px; border-bottom: 1px solid #333;">
+        <h1 style="margin:0; font-size: 20px;">MNHLLOKTY TERMINAL</h1>
+    </div>
 
-<div id="loading">CONNECTING TO DATABASE...</div>
-<div class="grid" id="gameGrid"></div>
+    <div class="grid" id="gameGrid">
+        <p>Initializing connection to GitHub...</p>
+    </div>
 
-<script>
-    const GITHUB_USER = "jnox906";
-    const GITHUB_REPO = "nettleweb.github.io";
+    <script>
+        const GITHUB_USER = "jnox906";
+        const GITHUB_REPO = "nettleweb.github.io";
 
-    async function bootSystem() {
-        // BYPASS: Fetching RAW directly from GitHub avoids the 50MB jsDelivr package limit
-        const rawListUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/games.json`;
+        async function bootSystem() {
+            // Pulling from Raw to bypass the 50MB limit
+            const rawListUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/games.json`;
 
-        try {
-            const response = await fetch(rawListUrl);
-            const games = await response.json();
-            
-            document.getElementById('loading').style.display = 'none';
-            const grid = document.getElementById('gameGrid');
-            
-            grid.innerHTML = games.map(game => `
-                <div class="card" onclick="stealthLaunch('${game.path}')">
-                    <img src="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${game.path}/thumbnail.png" 
-                         onerror="this.src='https://via.placeholder.com/300x169/111/00d4ff?text=${game.name}'">
-                    <div class="card-info">${game.name}</div>
-                </div>
-            `).join('');
-        } catch (err) {
-            document.getElementById('loading').innerHTML = "CONNECTION ERROR: LINK SEVERED";
-            console.error("DATA LINK OFFLINE", err);
+            try {
+                const response = await fetch(rawListUrl);
+                const games = await response.json();
+                
+                const grid = document.getElementById('gameGrid');
+                grid.innerHTML = games.map(game => `
+                    <div class="card" onclick="stealthLaunch('${game.path}')">
+                        <img src="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${game.path}/thumbnail.png" 
+                             onerror="this.src='https://via.placeholder.com/300x169/111/00d4ff?text=${game.name}'">
+                        <div class="card-info">${game.name.toUpperCase()}</div>
+                    </div>
+                `).join('');
+                
+                console.log("MNHLLOKTY: CONNECTION SECURE.");
+            } catch (err) {
+                document.getElementById('gameGrid').innerHTML = "DATA LINK OFFLINE. Check your GitHub repository.";
+                console.error("DATA LINK OFFLINE", err);
+            }
         }
-    }
 
-    function stealthLaunch(path) {
-        // The URL for the actual game file
-        const gameUrl = `https://raw.githack.com/${GITHUB_USER}/${GITHUB_REPO}/main/${path}/index.html`;
-        
-        // Open the stealth window
-        const win = window.open('about:blank', '_blank');
-        
-        if (win) {
-            win.document.body.style.margin = '0';
-            win.document.body.style.height = '100vh';
-            win.document.title = "Google Docs"; // Tab title for teachers
+        function stealthLaunch(path) {
+            const gameUrl = `https://raw.githack.com/${GITHUB_USER}/${GITHUB_REPO}/main/${path}/index.html`;
+            const win = window.open('about:blank', '_blank');
             
-            const iframe = win.document.createElement('iframe');
-            iframe.style.width = '100%'; 
-            iframe.style.height = '100%'; 
-            iframe.style.border = 'none';
-            iframe.src = gameUrl;
-            
-            win.document.body.appendChild(iframe);
-        } else {
-            alert("Please allow pop-ups for this site!");
+            if (win) {
+                win.document.body.style.margin = '0';
+                win.document.body.style.height = '100vh';
+                win.document.title = "Google Docs"; 
+                
+                const iframe = win.document.createElement('iframe');
+                iframe.style.width = '100%'; 
+                iframe.style.height = '100%'; 
+                iframe.style.border = 'none';
+                iframe.src = gameUrl;
+                
+                win.document.body.appendChild(iframe);
+            } else {
+                alert("Please allow pop-ups for this site!");
+            }
         }
-    }
 
-    bootSystem();
-</script>
+        bootSystem();
+    </script>
 </body>
 </html>
