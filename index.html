@@ -1,48 +1,192 @@
-const GITHUB_USER = "jnox906";
-const GITHUB_REPO = "nettleweb.github.io";
-
-async function bootSystem() {
-    // THIS IS THE BYPASS: We pull directly from GitHub's raw server
-    // This avoids the 50MB error and uses the 'github.com' domain which isn't blocked
-    const rawListUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/games.json`;
-
-    try {
-        const response = await fetch(rawListUrl);
-        const games = await response.json();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNHLLOKTY | Secure Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
+    <style>
+        /* CYBER-GRID THEME */
+        :root { 
+            --neon: #00d4ff; 
+            --bg: #050505; 
+            --card-bg: #111111;
+        }
         
-        const grid = document.getElementById('gameGrid');
-        grid.innerHTML = games.map(game => `
-            <div class="card" onclick="stealthLaunch('${game.path}')">
-                <img src="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${game.path}/thumbnail.png" 
-                     onerror="this.src='https://via.placeholder.com/300x169/111/00d4ff?text=${game.name}'">
-                <div class="card-info">${game.name.toUpperCase()}</div>
-            </div>
-        `).join('');
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden; 
+        }
+
+        header { 
+            padding: 20px; 
+            border-bottom: 1px solid var(--neon); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(0,0,0,0.9); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0,212,255,0.2);
+        }
+
+        .logo { 
+            font-family: 'Orbitron'; 
+            color: var(--neon); 
+            font-size: 1.8rem; 
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--neon);
+        }
+
+        .status-light {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #39ff14;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 10px #39ff14;
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 25px; 
+            padding: 30px; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid #333; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card:hover { 
+            border-color: var(--neon); 
+            transform: translateY(-8px) scale(1.02); 
+            box-shadow: 0 10px 30px rgba(0,212,255,0.4); 
+        }
+
+        .card img { 
+            width: 100%; 
+            aspect-ratio: 16/9; 
+            object-fit: cover;
+            border-bottom: 1px solid #222;
+        }
+
+        .card-info { 
+            padding: 15px; 
+            text-align: center; 
+            font-size: 1rem; 
+            font-weight: bold;
+            color: var(--neon);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* LOADING ANIMATION */
+        #loader {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5rem;
+            color: var(--neon);
+            font-family: 'Orbitron';
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">MNHLLOKTY</div>
+    <div style="font-size: 0.8rem; color: #aaa;">
+        <span class="status-light"></span> SYSTEM: STEALTH_ACTIVE
+    </div>
+</header>
+
+<div id="loader">INITIALIZING DATA BYPASS...</div>
+
+<div class="grid" id="gameGrid">
+    </div>
+
+<script>
+    // CONFIGURATION - Pointing to your unblocked GitHub data
+    const USER = "jnox906";
+    const REPO = "nettleweb.github.io";
+    const BRANCH = "main"; // Lowercase 'main' to fix the 404 error
+
+    async function initPortal() {
+        // BYPASS STRATEGY: Use Raw GitHub Usercontent to avoid 50MB jsDelivr limit
+        const listUrl = `https://raw.githubusercontent.com/${USER}/${REPO}/${BRANCH}/games.json`;
         
-        console.log("MNHLLOKTY: CONNECTION SECURE.");
-    } catch (err) {
-        console.error("DATA LINK OFFLINE", err);
+        try {
+            const response = await fetch(listUrl);
+            if (!response.ok) throw new Error("Network response was not ok");
+            
+            const games = await response.json();
+            document.getElementById('loader').style.display = 'none';
+            
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = games.map(game => `
+                <div class="card" onclick="launchGame('${game.path}', '${game.name}')">
+                    <img src="https://raw.githubusercontent.com/${USER}/${REPO}/${BRANCH}/${game.path}/thumbnail.png" 
+                         onerror="this.src='https://via.placeholder.com/300x169/111/00d4ff?text=${game.name}'">
+                    <div class="card-info">${game.name}</div>
+                </div>
+            `).join('');
+            
+        } catch (error) {
+            document.getElementById('loader').innerHTML = "CRITICAL ERROR: DATA LINK SEVERED.<br><small>Check if github.com is blocked.</small>";
+            console.error("Portal Error:", error);
+        }
     }
-}
 
-function stealthLaunch(path) {
-    // This creates the About:Blank tab just like GN-Math
-    const gameUrl = `https://raw.githack.com/${GITHUB_USER}/${GITHUB_REPO}/main/${path}/index.html`;
-    const win = window.open('about:blank', '_blank');
-    
-    win.document.body.style.margin = '0';
-    win.document.body.style.height = '100vh';
-    win.document.title = "Google Docs"; // Stealth Title
-    
-    const iframe = win.document.createElement('iframe');
-    iframe.style.width = '100%'; 
-    iframe.style.height = '100%'; 
-    iframe.style.border = 'none';
-    iframe.src = gameUrl;
-    
-    win.document.body.appendChild(iframe);
-}
+    function launchGame(path, name) {
+        // THE GN-MATH STEALTH TECHNIQUE (About:Blank + Name Cloaking)
+        const gameUrl = `https://raw.githack.com/${USER}/${REPO}/${BRANCH}/${path}/index.html`;
+        
+        const win = window.open('about:blank', '_blank');
+        if (!win) {
+            alert("Please allow pop-ups to launch the secure terminal.");
+            return;
+        }
 
-bootSystem();
+        win.document.body.style.margin = '0';
+        win.document.body.style.height = '100vh';
+        win.document.body.style.backgroundColor = 'black';
+        
+        // Cloak the tab for teachers
+        win.document.title = "Math Assignment - Linear Equations"; 
+        
+        // Add a fake Favicon (Google Drive icon)
+        const link = win.document.createElement('link');
+        link.rel = 'icon';
+        link.href = 'https://ssl.gstatic.com/docs/doclist/images/infinite_drive_favicon.ico';
+        win.document.head.appendChild(link);
+        
+        const iframe = win.document.createElement('iframe');
+        iframe.style.width = '100%'; 
+        iframe.style.height = '100%'; 
+        iframe.style.border = 'none';
+        iframe.src = gameUrl;
+        
+        win.document.body.appendChild(iframe);
+    }
+
+    // Boot system
+    initPortal();
+</script>
+
+</body>
+</html>
+
 
 
