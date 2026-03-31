@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNHLLOKTY | Secure Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon: #00d4ff; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
+        header { padding: 20px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); position: sticky; top: 0; z-index: 100; }
+        .logo { font-family: 'Orbitron'; color: var(--neon); font-size: 1.5rem; letter-spacing: 3px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: #111; border: 1px solid #333; border-radius: 10px; overflow: hidden; transition: 0.3s; cursor: pointer; }
+        .card:hover { border-color: var(--neon); transform: translateY(-5px); box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+        .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+        .card-info { padding: 10px; text-align: center; font-size: 0.9rem; color: var(--neon); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">MNHLLOKTY</div>
+    <div style="color: #555;">STATUS: STEALTH ACTIVE</div>
+</header>
+
+<div class="grid" id="gameGrid">
+    </div>
+
+<script>
+    const USER = "jnox906";
+    const REPO = "nettleweb.github.io";
+
+    async function loadGames() {
+        // BYPASS: Fetching RAW instead of CDN to avoid the 50MB limit error
+        const url = `https://raw.githubusercontent.com/${USER}/${REPO}/main/games.json`;
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = data.map(game => `
+                <div class="card" onclick="cloak('${game.path}')">
+                    <img src="https://cdn.jsdelivr.net/gh/${USER}/${REPO}@main/${game.path}/thumbnail.png" onerror="this.src='https://via.placeholder.com/300x169/111/00d4ff?text=${game.name}'">
+                    <div class="card-info">${game.name.toUpperCase()}</div>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error("Link Error", e);
+        }
+    }
+
+    function cloak(path) {
+        // THE GN-MATH STEALTH TECHNIQUE
+        const gameUrl = `https://cdn.jsdelivr.net/gh/${USER}/${REPO}@main/${path}/index.html`;
+        const win = window.open('about:blank', '_blank');
+        win.document.body.style.margin = '0';
+        win.document.body.style.height = '100vh';
+        win.document.title = "Math Assignment"; // Cloak Title
+        
+        const iframe = win.document.createElement('iframe');
+        iframe.style.width = '100%'; iframe.style.height = '100%'; iframe.style.border = 'none';
+        iframe.src = gameUrl;
+        win.document.body.appendChild(iframe);
+    }
+
+    loadGames();
+</script>
+</body>
+</html>
